@@ -9,20 +9,22 @@ export default (db: Database) => {
 
   router.get(
     '/',
-    jsonRoute(async (req, res) => {
-      if (typeof req.query.id !== 'string') {
-        const movies = await messages.findAll()
-        res.status(200)
-        res.json(movies)
-        return
+    jsonRoute(async (req) => {
+      const { id, title } = req.query as { id: string; title: string }
+
+      if (id) {
+        const ids = id.split(',').map(Number)
+        const movies = await messages.findByIds(ids)
+        return movies
       }
 
-      // a hard-coded solution for your first controller test
-      const ids = req.query.id!.split(',').map(Number)
-      const movies = await messages.findByIds(ids)
+      if (title) {
+        const titles = title!.split(',')
+        const movies = await messages.findByTitles(titles)
+        return movies
+      }
 
-      res.status(200)
-      res.json(movies)
+      return messages.findAll()
     })
   )
 
