@@ -15,5 +15,6 @@ coverage
 *.local
 
 data/database*
+data/movies*
 
 .env
