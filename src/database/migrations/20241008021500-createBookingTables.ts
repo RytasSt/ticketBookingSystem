@@ -33,7 +33,7 @@ export async function up(db: Kysely<SqliteDatabase>) {
 }
 
 export async function down(db: Kysely<SqliteDatabase>) {
-  db.schema.dropTable('screenings')
-  db.schema.dropTable('bookings')
-  db.schema.dropTable('users')
+  await db.schema.dropTable('screenings').execute()
+  await db.schema.dropTable('bookings').execute()
+  await db.schema.dropTable('users').execute()
 }

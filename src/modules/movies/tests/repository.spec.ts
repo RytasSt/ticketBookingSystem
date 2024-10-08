@@ -6,9 +6,12 @@ const db = await createTestDatabase()
 const repository = buildRepository(db)
 const createMovies = createFor(db, 'movies')
 
+beforeEach(async () => {
+  await db.deleteFrom('movies').execute()
+})
+
 describe('findAll', () => {
   it('should return existing movies', async () => {
-    // directly create movies in the database
     await createMovies([
       {
         id: 1,
@@ -28,8 +31,15 @@ describe('findAll', () => {
     ])
   })
 
+  it('should return empty array if there are no movies', async () => {
+    const movies = await repository.findAll()
+
+    expect(movies).toEqual([])
+  })
+})
+
+describe('findByIds', () => {
   it('should return a list of movies by their ID', async () => {
-    // directly create movies in the database
     await createMovies([
       {
         id: 22,
@@ -48,10 +58,8 @@ describe('findAll', () => {
       },
     ])
 
-    // select a few of them
     const movies = await repository.findByIds([234, 4153])
 
-    // expect to have only the selected movies
     expect(movies).toHaveLength(2)
     expect(movies).toEqual([
       {
@@ -65,5 +73,30 @@ describe('findAll', () => {
         year: 2010,
       },
     ])
+  })
+
+  it('should return empty array if movies with given ids dont exist', async () => {
+    await createMovies([
+      {
+        id: 234,
+        title: 'Sherlock Holmes',
+        year: 2009,
+      },
+      {
+        id: 4153,
+        title: 'Inception',
+        year: 2010,
+      },
+    ])
+
+    const movies = await repository.findByIds([1, 2])
+
+    expect(movies).toEqual([])
+  })
+
+  it('should return empty array if ids were not provided', async () => {
+    const movies = await repository.findByIds([])
+
+    expect(movies).toEqual([])
   })
 })
